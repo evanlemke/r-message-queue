@@ -28,6 +28,7 @@ public class ActiveMQHandler {
 	protected Session session = null;
 	protected String queue = null;
 
+	
 	/**
 	 * Open a connection to this queue.
 	 */

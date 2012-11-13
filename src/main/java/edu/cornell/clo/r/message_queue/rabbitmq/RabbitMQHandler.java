@@ -2,6 +2,7 @@ package edu.cornell.clo.r.message_queue.rabbitmq;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.rabbitmq.client.Channel;
@@ -20,6 +21,7 @@ public class RabbitMQHandler {
 	protected Channel channel = null;
 	protected String queue = null;
 
+	
 	/**
 	 * Open a connection to the given queue.
 	 * @param url
@@ -27,6 +29,17 @@ public class RabbitMQHandler {
 	 * @return
 	 */
 	public int open(String url, String queue) {
+		return open(url, queue, null);
+	}
+
+	
+	/**
+	 * Open a connection to the given queue.
+	 * @param url
+	 * @param queue
+	 * @return
+	 */
+	public int open(String url, String queue, String topic) {
 		int status = -1;
 		
 		ConnectionFactory factory = new ConnectionFactory();
@@ -34,6 +47,11 @@ public class RabbitMQHandler {
 		try {
 			connection = factory.newConnection();
 			channel = connection.createChannel();
+	
+			// unsupported at the moment, but it's here
+			if (!StringUtils.isEmpty(topic)) {
+				channel.exchangeDeclare(topic, "topic");
+			}
 			
 			// ensure the queue exists..
 			Queue.DeclareOk result = channel.queueDeclare(queue, true, false, false, null);
