@@ -25,6 +25,7 @@ public class ActiveMQConsumer extends ActiveMQHandler implements Consumer {
 		try {
 			// is there a message ready/waiting?
 			Message message = consumer.receiveNoWait();
+//			Message message = consumer.receive();
 			if (message != null) {
 				
 				// is it a text message?

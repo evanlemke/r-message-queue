@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
  * 
  * Not very well organized, but I wanted all the opening/closing of connections to be in one place.
  * 
+ * TODO fails to create 2 connections to the same internal instance for testing (vm://)
+ * 
  * @author msm336
  *
  */
