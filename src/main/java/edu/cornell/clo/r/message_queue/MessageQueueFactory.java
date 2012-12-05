@@ -36,12 +36,18 @@ public class MessageQueueFactory {
 	public static Consumer getConsumerFor(String url, String queueName, String queueType) {
 		logger.debug("getConsumerFor('" + url + "', '" + queueName + "', '" + queueType + "'");
 		Consumer consumer = null;
-		if (StringUtils.equalsIgnoreCase(QUEUE_TYPE_RABBITMQ, queueType)) {
+		
+		if (StringUtils.isEmpty(queueType)) {
+			logger.error("getConsumerFor() - queueType must be specified.");
+			
+		} else if (QUEUE_TYPE_RABBITMQ.equalsIgnoreCase(queueType)) {
 			consumer = new RabbitMQConsumer();
 			consumer.open(url, queueName);
-		} else if (StringUtils.equalsIgnoreCase(QUEUE_TYPE_ACTIVEMQ, queueType)) {
+			
+		} else if (QUEUE_TYPE_ACTIVEMQ.equalsIgnoreCase(queueType)) {
 			consumer = new ActiveMQConsumer();
 			consumer.open(url, queueName);
+			
 		} else {
 			logger.error("getConsumerFor() - Unsupported queue type: " + queueType);
 		}
@@ -49,13 +55,20 @@ public class MessageQueueFactory {
 	}
 	
 	public static Producer getProducerFor(String url, String queueName, String queueType) {
+		logger.debug("getProducerFor('" + url + "', '" + queueName + "', '" + queueType + "'");
 		Producer producer = null;
-		if (StringUtils.equalsIgnoreCase(QUEUE_TYPE_RABBITMQ, queueType)) {
+		
+		if (StringUtils.isEmpty(queueType)) {
+			logger.error("getProducerFor() - queueType must be specified.");
+			
+		} else if (QUEUE_TYPE_RABBITMQ.equalsIgnoreCase(queueType)) {
 			producer = new RabbitMQProducer();
 			producer.open(url, queueName);
-		} else if (StringUtils.equalsIgnoreCase(QUEUE_TYPE_ACTIVEMQ, queueType)) {
+			
+		} else if (QUEUE_TYPE_ACTIVEMQ.equalsIgnoreCase(queueType)) {
 			producer = new ActiveMQProducer();
 			producer.open(url, queueName);
+			
 		} else {
 			logger.error("getProducerFor() - Unsupported queue type: " + queueType);
 		}

@@ -10,6 +10,8 @@ import edu.cornell.clo.r.message_queue.Producer;
 public class ActiveMQProducer extends ActiveMQHandler implements Producer {
 	static Logger logger = Logger.getLogger(ActiveMQProducer.class);
 
+	public String lastStatusMessage;
+	
 	/**
 	 * Create and put a message on the queue.
 	 */
@@ -17,11 +19,24 @@ public class ActiveMQProducer extends ActiveMQHandler implements Producer {
 		int result = -1;
 		
 		try {
-			TextMessage tmessage = session.createTextMessage(message);
-			producer.send(tmessage);
-			result = 1;
+			if (session != null) {
+				TextMessage tmessage = session.createTextMessage(message);
+				
+				if (producer != null) {
+					producer.send(tmessage);
+					result = 1;
+					lastStatusMessage = "message sent";
+				} else {
+					result = -5;
+					lastStatusMessage = "ERROR: producer is null";
+				}
+			} else {
+				result = -4;
+				lastStatusMessage = "ERROR: session is null";
+			}
 		} catch (JMSException e) {
-			logger.error("ERROR: Unable to create/send text message to queue: " + queue, e);
+			lastStatusMessage = "ERROR: Unable to create/send text message to queue: " + queue + ", " + e.getMessage();
+			logger.error(lastStatusMessage, e);
 			result = -2;
 		}
 		return result;

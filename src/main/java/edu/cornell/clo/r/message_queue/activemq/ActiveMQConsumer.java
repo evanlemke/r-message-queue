@@ -11,7 +11,7 @@ import edu.cornell.clo.r.message_queue.Consumer;
 public class ActiveMQConsumer extends ActiveMQHandler implements Consumer {
 	static Logger logger = Logger.getLogger(ActiveMQConsumer.class);
 	
-
+	public String lastStatusMessage;
 	
 
 	/**
@@ -31,22 +31,29 @@ public class ActiveMQConsumer extends ActiveMQHandler implements Consumer {
 				// is it a text message?
 				if (message instanceof TextMessage) {
 					TextMessage tmessage = (TextMessage) message;
+					lastStatusMessage = "message received";
 					results = tmessage.getText();
 				
 				// wrong kind of message.. rollback/skip
 				} else {
-					logger.warn("WARNING: Adding to poison/DLQ because it isn't a text message: " + message.getJMSType() + ", id: " + message.getJMSMessageID());
-					session.rollback();
+					lastStatusMessage = "WARNING: Adding to poison/DLQ because it isn't a text message: " + message.getJMSType() + ", id: " + message.getJMSMessageID();
+					logger.debug(lastStatusMessage);
+					if (session != null) {
+						session.rollback();
+					} else {
+						lastStatusMessage = "WARNING: Unable to adding to poison/DLQ (rollback) because it isn't a text message: " + message.getJMSType() + ", id: " + message.getJMSMessageID();
+					}
 					
 					// check the next message recursively
 					results = getNextText();
 				}
 			} else {
-				logger.debug("No message available.");
+				lastStatusMessage = "No message available";
+				logger.debug(lastStatusMessage);
 			}
 		} catch (JMSException e) {
-			logger.error("ERROR: Unable to retrieve a message from this queue: " + queue, e);
-			e.printStackTrace();
+			lastStatusMessage = "ERROR: Unable to retrieve a message from this queue: " + queue + ", " + e.getMessage();
+			logger.error(lastStatusMessage, e);
 		}
 		
 		return results;

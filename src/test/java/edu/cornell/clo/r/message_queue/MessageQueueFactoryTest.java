@@ -4,4 +4,8 @@ import junit.framework.TestCase;
 
 public class MessageQueueFactoryTest extends TestCase {
 
+	
+	public void testExample() {
+		
+	}
 }
