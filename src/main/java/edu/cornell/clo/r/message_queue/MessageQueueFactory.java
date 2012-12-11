@@ -23,6 +23,7 @@ public class MessageQueueFactory {
 	
 	
 	public MessageQueueFactory() { }
+	public static int lastStatusCode = 0;
 	
 	
 
@@ -42,11 +43,11 @@ public class MessageQueueFactory {
 			
 		} else if (QUEUE_TYPE_RABBITMQ.equalsIgnoreCase(queueType)) {
 			consumer = new RabbitMQConsumer();
-			consumer.open(url, queueName);
+			MessageQueueFactory.lastStatusCode = consumer.open(url, queueName);
 			
 		} else if (QUEUE_TYPE_ACTIVEMQ.equalsIgnoreCase(queueType)) {
 			consumer = new ActiveMQConsumer();
-			consumer.open(url, queueName);
+			MessageQueueFactory.lastStatusCode = consumer.open(url, queueName);
 			
 		} else {
 			logger.error("getConsumerFor() - Unsupported queue type: " + queueType);
@@ -63,11 +64,11 @@ public class MessageQueueFactory {
 			
 		} else if (QUEUE_TYPE_RABBITMQ.equalsIgnoreCase(queueType)) {
 			producer = new RabbitMQProducer();
-			producer.open(url, queueName);
+			MessageQueueFactory.lastStatusCode = producer.open(url, queueName);
 			
 		} else if (QUEUE_TYPE_ACTIVEMQ.equalsIgnoreCase(queueType)) {
 			producer = new ActiveMQProducer();
-			producer.open(url, queueName);
+			MessageQueueFactory.lastStatusCode = producer.open(url, queueName);
 			
 		} else {
 			logger.error("getProducerFor() - Unsupported queue type: " + queueType);

@@ -10,7 +10,6 @@ import edu.cornell.clo.r.message_queue.Producer;
 public class ActiveMQProducer extends ActiveMQHandler implements Producer {
 	static Logger logger = Logger.getLogger(ActiveMQProducer.class);
 
-	public String lastStatusMessage;
 	
 	/**
 	 * Create and put a message on the queue.
@@ -39,6 +38,7 @@ public class ActiveMQProducer extends ActiveMQHandler implements Producer {
 			logger.error(lastStatusMessage, e);
 			result = -2;
 		}
+		lastStatusCode = result;
 		return result;
 	}
 

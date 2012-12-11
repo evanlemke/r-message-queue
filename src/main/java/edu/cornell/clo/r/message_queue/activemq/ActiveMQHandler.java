@@ -29,7 +29,33 @@ public class ActiveMQHandler {
 	protected Connection connection = null;
 	protected Session session = null;
 	protected String queue = null;
+	
+	public String lastStatusMessage = "unknown";
+	public int lastStatusCode = 0;
+	
 
+	
+	public String getStatusString(int statusCode) {
+		String result = "unknown";
+		if (statusCode > 0) {
+			result = "success";
+		} else if (statusCode == -1) {
+			result = "STATUS:  Unknown error (-1)";
+		} else if (statusCode == -2) {
+			result = "STATUS:  JMS exception (-2)";
+		} else if (statusCode == -4) {
+			result = "STATUS:  Session is null (-4)";
+		} else if (statusCode == -5) {
+			result = "STATUS:  Producer/Consumer is null (-5)";
+		} else if (statusCode == -6) {
+			result = "STATUS:  No message available (-6)";
+		} else if (statusCode == -7) {
+			result = "STATUS:  Unable to add message to the poison queue (-7)";
+		} else if (statusCode == -8) {
+			result = "STATUS:  Next message was not a text message (-8)";
+		}
+		return result;
+	}
 	
 	/**
 	 * Open a connection to this queue.
@@ -52,6 +78,7 @@ public class ActiveMQHandler {
 			logger.error("ERROR: Unable to create connection to activemq queue: " + queue, e);
 			status = -2;
 		}
+		lastStatusCode = status;
 		return status;
 	}
 	
@@ -76,6 +103,7 @@ public class ActiveMQHandler {
 			logger.error("ERROR: Unable to create connection to queue: " + queue, e);
 			status = -2;
 		}
+		lastStatusCode = status;
 		return status;
 	}
 	
@@ -107,6 +135,7 @@ public class ActiveMQHandler {
 			status = -2;
 		}
 		
+		lastStatusCode = status;
 		return status;
 	}
 }
