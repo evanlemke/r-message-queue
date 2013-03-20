@@ -20,6 +20,7 @@ public class RabbitMQHandler {
 	protected Connection connection = null;
 	protected Channel channel = null;
 	protected String queue = null;
+	protected String hostUrl = null;
 
 	
 	/**
@@ -42,6 +43,8 @@ public class RabbitMQHandler {
 	public int open(String url, String queue, String topic) {
 		int status = -1;
 		
+		this.hostUrl = url;
+		
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost(url);
 		try {
@@ -57,7 +60,11 @@ public class RabbitMQHandler {
 			Queue.DeclareOk result = channel.queueDeclare(queue, true, false, false, null);
 			if (result != null) {
 				String queueName = result.getQueue();
-				channel.queueBind(queueName, DEFAULT_EXCHANGE, DEFAULT_ROUTING);
+				
+				// ensure we only retrieve 1 message at a time
+				channel.basicQos(1);
+				
+				//channel.queueBind(queueName, DEFAULT_EXCHANGE, DEFAULT_ROUTING);
 				status = 1;
 			} else {
 				status = -3;

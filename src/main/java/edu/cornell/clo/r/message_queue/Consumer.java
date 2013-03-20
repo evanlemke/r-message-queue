@@ -10,6 +10,6 @@ public interface Consumer {
 	 * Non blocking call that looks for the next text message.
 	 * @return
 	 */
-	public String getNextText();
+	public STextMessage getNextText();
 
 }

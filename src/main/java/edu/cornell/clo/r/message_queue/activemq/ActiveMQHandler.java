@@ -24,11 +24,11 @@ import org.apache.log4j.Logger;
 public class ActiveMQHandler {
 	static Logger logger = Logger.getLogger(ActiveMQHandler.class);
 	
-	protected MessageConsumer consumer = null;
-	protected MessageProducer producer = null;
 	protected Connection connection = null;
 	protected Session session = null;
+	protected Destination destination = null;
 	protected String queue = null;
+	protected String hostUrl = null;
 	
 	public String lastStatusMessage = "unknown";
 	public int lastStatusCode = 0;
@@ -57,55 +57,27 @@ public class ActiveMQHandler {
 		return result;
 	}
 	
-	/**
-	 * Open a connection to this queue.
-	 */
-	public int openConsumer(String url, String queue) {
-		int status = -1;
-		this.queue = queue;
-		
-		ConnectionFactory cf = new ActiveMQConnectionFactory(url);
-		try {
-			connection = cf.createConnection();
-			connection.start();
-			
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Destination destination = session.createQueue(queue);
-			consumer = session.createConsumer(destination);
-		
-			status = 1;
-		} catch (JMSException e) {
-			logger.error("ERROR: Unable to create connection to activemq queue: " + queue, e);
-			status = -2;
-		}
-		lastStatusCode = status;
-		return status;
-	}
 	
+
 	/**
-	 * Open a connection to this queue.
+	 * Find/create a session object
+	 * @param url
+	 * @return
+	 * @throws JMSException
 	 */
-	public int openProducer(String url, String queue) {
-		int status = -1;
-		this.queue = queue;
-		
-		ConnectionFactory cf = new ActiveMQConnectionFactory(url);
-		try {
+	protected Session getSession(String url) throws JMSException {
+		if (session == null) {
+			ConnectionFactory cf = new ActiveMQConnectionFactory(url);
 			connection = cf.createConnection();
 			connection.start();
-			
+				
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			Destination destination = session.createQueue(queue);
-			producer = session.createProducer(destination);
-		
-			status = 1;
-		} catch (JMSException e) {
-			logger.error("ERROR: Unable to create connection to queue: " + queue, e);
-			status = -2;
 		}
-		lastStatusCode = status;
-		return status;
+		return session;
 	}
+
+
+	
 	
 	
 	/**
@@ -115,12 +87,6 @@ public class ActiveMQHandler {
 		int status = -1;
 		
 		try {
-			if (consumer != null) {
-				consumer.close();
-			}
-			if (producer != null) {
-				producer.close();
-			}
 			
 			if (session != null) {
 				session.close();
@@ -131,7 +97,7 @@ public class ActiveMQHandler {
 			}
 			status = 1;
 		} catch (JMSException e) {
-			logger.error("ERROR: Unable to close connection for queue: " + this.queue, e);
+			logger.error("ERROR: Unable to close connection and session for host: " + this.hostUrl, e);
 			status = -2;
 		}
 		
