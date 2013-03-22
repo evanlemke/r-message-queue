@@ -122,6 +122,7 @@ public class ActiveMQConsumer extends ActiveMQHandler implements Consumer {
 			status = -2;
 		}
 		
+		lastStatusCode = status;
 		return status;
 	}
 
