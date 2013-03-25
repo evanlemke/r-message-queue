@@ -35,7 +35,7 @@ public class MessageQueueFactory {
 	 * @return
 	 */
 	public static Consumer getConsumerFor(String url, String queueName, String queueType) {
-		logger.debug("getConsumerFor('" + url + "', '" + queueName + "', '" + queueType + "'");
+		logger.debug("getConsumerFor('" + url + "', '" + queueName + "', '" + queueType + "')");
 		Consumer consumer = null;
 		
 		if (StringUtils.isEmpty(queueType)) {
@@ -56,7 +56,7 @@ public class MessageQueueFactory {
 	}
 	
 	public static Producer getProducerFor(String url, String queueName, String queueType) {
-		logger.debug("getProducerFor('" + url + "', '" + queueName + "', '" + queueType + "'");
+		logger.debug("getProducerFor('" + url + "', '" + queueName + "', '" + queueType + "')");
 		Producer producer = null;
 		
 		if (StringUtils.isEmpty(queueType)) {
