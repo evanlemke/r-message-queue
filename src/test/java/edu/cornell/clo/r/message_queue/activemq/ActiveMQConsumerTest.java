@@ -17,7 +17,7 @@ public class ActiveMQConsumerTest extends TestCase {
 	private static final String queueName = "junit-test-queue";
 	
 	/** special local URL to enable testing **/
-	private static final String queueUrl = "vm:localhost?broker.persistent=false";
+	private static final String queueUrl = "vm://localhost?broker.persistent=false";
 	//private static final String queueUrl = "tcp://ag-clo-ampbuild:61616";
 	
 	private ConnectionFactory connectionFactory = null;
