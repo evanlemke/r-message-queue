@@ -1,5 +1,7 @@
 package edu.cornell.clo.r.message_queue.activemq;
 
+import java.util.Enumeration;
+
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -41,6 +43,23 @@ public class ActiveMQConsumer extends ActiveMQHandler implements Consumer {
 					
 					result = new STextMessage();
 					result.value = tmessage.getText();
+			
+					// get a list of all properties..
+					Enumeration names = tmessage.getPropertyNames();
+					if (names.hasMoreElements()) {
+						logger.debug("    properties to set");
+					} else {
+						logger.debug("    no properties to set");
+					}
+					while (names.hasMoreElements()) {
+						String propName = (String)names.nextElement();
+						String propValue = String.valueOf(tmessage.getObjectProperty(propName));
+						logger.debug("    setting property '" + propName + "', value: '" + propValue + "'");
+						result.properties.put(propName, propValue);
+					}
+					result.properties.put(STextMessage.JMS_MESSAGE_ID, tmessage.getJMSMessageID());
+					result.properties.put(STextMessage.JMS_TIMESTAMP, String.valueOf(tmessage.getJMSTimestamp()));
+					
 					
 					ActiveMQDestination dest = (ActiveMQDestination) tmessage.getJMSReplyTo();
 					if (dest != null) {

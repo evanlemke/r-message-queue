@@ -17,7 +17,7 @@ public class ActiveMQConsumerTest extends TestCase {
 	private static final String queueName = "junit-test-queue";
 	
 	/** special local URL to enable testing **/
-	private static final String queueUrl = "vm://localhost?broker.persistent=false";
+	private static final String queueUrl = "vm://localhost?broker.persistent=false&broker.useJmx=false&jms.prefetchPolicy.queuePrefetch=1";
 	//private static final String queueUrl = "tcp://ag-clo-ampbuild:61616";
 	
 	private ConnectionFactory connectionFactory = null;
@@ -52,7 +52,6 @@ public class ActiveMQConsumerTest extends TestCase {
 		Producer producer = MessageQueueFactory.getProducerFor(queueUrl, queueName, "activeMQ");
 		String message = "<currentTime>" + System.currentTimeMillis() + "</currentTime>";
 		int sendStatus = producer.putText(message);
-		int status = producer.close();
 		Assert.assertEquals("Message was not sent", 1, sendStatus);
 	
 	
@@ -70,8 +69,16 @@ public class ActiveMQConsumerTest extends TestCase {
 			received = consumer.getNextText();
 			logger.debug("waiting, received: " + received);
 		}
+		
+		// producer needs to stay open the entire time because the VM queue will die without a reference
+		int status = producer.close();
+		
 		status = consumer.close();
 		Assert.assertEquals("Message should be equal", message, received.value);
+		Assert.assertNotNull("Message properties should not be null", received.properties);
+		Assert.assertTrue("Message properties should be larger than 2", received.properties.size() >= 2);
+		Assert.assertNotNull("Message id shouldn't be empty", received.properties.get(STextMessage.JMS_MESSAGE_ID));
+		Assert.assertNotNull("Timestamp shouldn't be empty", received.properties.get(STextMessage.JMS_TIMESTAMP));
 		Assert.assertEquals("ReplyTo should be null", null, received.replyTo);
 		Assert.assertEquals("CorrelationId should be null", null, received.correlationId);
 	}
@@ -91,7 +98,6 @@ public class ActiveMQConsumerTest extends TestCase {
 		Producer producer = MessageQueueFactory.getProducerFor(queueUrl, queueName, "activeMQ");
 		String message = "<currentTime>" + System.currentTimeMillis() + "</currentTime>";
 		int sendStatus = producer.putText(message, correlationId, replyTo);
-		int status = producer.close();
 		Assert.assertEquals("Message was not sent", 1, sendStatus);
 	
 		// reconnect to the queue
@@ -108,6 +114,10 @@ public class ActiveMQConsumerTest extends TestCase {
 			received = consumer.getNextText();
 			logger.debug("waiting, received: " + received);
 		}
+		
+		// producer needs to stay open the entire time because the VM queue will die without a reference
+		int status = producer.close();
+		
 		status = consumer.close();
 		Assert.assertEquals("Message should be equal", message, received.value);
 		Assert.assertEquals("CorrelationId should be equal", correlationId, received.correlationId);
