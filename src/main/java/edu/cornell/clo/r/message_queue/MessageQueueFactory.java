@@ -52,6 +52,9 @@ public class MessageQueueFactory {
 		} else {
 			logger.error("getConsumerFor() - Unsupported queue type: " + queueType);
 		}
+		if (MessageQueueFactory.lastStatusCode < 0) {
+			consumer = null;
+		}
 		return consumer;
 	}
 	
@@ -72,6 +75,9 @@ public class MessageQueueFactory {
 			
 		} else {
 			logger.error("getProducerFor() - Unsupported queue type: " + queueType);
+		}
+		if (MessageQueueFactory.lastStatusCode < 0) {
+			producer = null;
 		}
 		return producer;
 	}
